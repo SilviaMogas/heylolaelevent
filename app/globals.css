@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  @apply bg-bone text-charcoal antialiased;
+}
+
+.brand-dot {
+  display: inline-block;
+  width: 0.28em;
+  height: 0.28em;
+  background-color: #f28c33;
+  margin-inline-start: 0.12em;
+}
+
+[dir="rtl"] .flip-rtl {
+  transform: scaleX(-1);
+}
