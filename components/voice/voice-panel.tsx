@@ -134,7 +134,10 @@ export function VoicePanelLauncher({
             {...events}
             pendingQuestion={pendingQuestion}
             onPendingConsumed={onPendingConsumed}
-            onClose={() => setOpen(false)}
+            onClose={() => {
+              setOpen(false);
+              onPendingConsumed?.();
+            }}
           />
         </ConversationProvider>
       )}
@@ -196,6 +199,8 @@ function VoicePanelInner({
   const mockRef = useRef<MockConversation | null>(null);
   const transcriptRef = useRef<HTMLDivElement>(null);
   const pendingSent = useRef(false);
+  // Text we already rendered as a user bubble locally — dedupe the SDK echo.
+  const lastLocalUserText = useRef<string | null>(null);
   const conversationId = useRef<Promise<string | undefined> | null>(null);
 
   const record = useCallback((body: Record<string, unknown>) => {
@@ -247,6 +252,14 @@ function VoicePanelInner({
     },
     onMessage: (m: { message?: string; source?: string }) => {
       if (m?.message) {
+        if (
+          m.source === "user" &&
+          lastLocalUserText.current !== null &&
+          m.message.trim() === lastLocalUserText.current
+        ) {
+          lastLocalUserText.current = null;
+          return;
+        }
         pushLine({
           role: m.source === "user" ? "user" : "agent",
           text: m.message,
@@ -344,6 +357,7 @@ function VoicePanelInner({
       onPendingConsumed?.();
     } else if (state === "live") {
       pendingSent.current = true;
+      lastLocalUserText.current = pendingQuestion.trim();
       pushLine({ role: "user", text: pendingQuestion });
       conversation.sendUserMessage(pendingQuestion);
       onPendingConsumed?.();
@@ -440,6 +454,7 @@ function VoicePanelInner({
     if (state === "demo") {
       mockRef.current?.send(text);
     } else if (state === "live") {
+      lastLocalUserText.current = text.trim();
       pushLine({ role: "user", text });
       conversation.sendUserMessage(text);
     }
