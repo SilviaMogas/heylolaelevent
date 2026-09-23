@@ -178,4 +178,39 @@ describe("VoicePanel — pending question & live mode", () => {
       expect(screen.getByText("other")).toBeInTheDocument(),
     );
   });
+
+  it("dedupes repeated agent_response frames from the SDK", async () => {
+    stubSignedUrl();
+    stubMic();
+
+    renderPanel();
+    fireEvent.click(screen.getByRole("button", { name: /ask about adoption/i }));
+    // Keep the transcript so three bubbles coexist (default keeps only two).
+    fireEvent.click(
+      await screen.findByRole("checkbox", { name: /keep a transcript/i }),
+    );
+    await consentAndStart();
+    await waitFor(() =>
+      expect(screen.getByText(/live · elevenlabs/i)).toBeInTheDocument(),
+    );
+
+    // ElevenLabs re-emits the same agent text after a client tool call.
+    capturedOptions.onMessage?.({ message: "agent answer", source: "agent" });
+    capturedOptions.onMessage?.({ message: "agent answer", source: "agent" });
+    await waitFor(() =>
+      expect(screen.getAllByText("agent answer")).toHaveLength(1),
+    );
+
+    // A different agent text still renders.
+    capturedOptions.onMessage?.({ message: "more info", source: "agent" });
+    await waitFor(() =>
+      expect(screen.getByText("more info")).toBeInTheDocument(),
+    );
+
+    // And the same text separated by another message still shows.
+    capturedOptions.onMessage?.({ message: "agent answer", source: "agent" });
+    await waitFor(() =>
+      expect(screen.getAllByText("agent answer")).toHaveLength(2),
+    );
+  });
 });
