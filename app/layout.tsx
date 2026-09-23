@@ -6,9 +6,20 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://eleven.heylola.co"),
+  applicationName: "HeyLola",
   title: "HeyLola — adopt a dog in Dubai (challenge demo)",
   description:
     "Your dog's lifestyle concierge. Ask Lola, a voice AI, how to adopt a dog in Dubai and how Dubai Municipality registration works.",
+  openGraph: {
+    title: "HeyLola — adopt a dog in Dubai (challenge demo)",
+    description:
+      "Your dog's lifestyle concierge. Ask Lola, a voice AI, how to adopt a dog in Dubai and how Dubai Municipality registration works.",
+    url: "https://eleven.heylola.co",
+    siteName: "HeyLola",
+    type: "website",
+  },
+  twitter: { card: "summary" },
 };
 
 export default function RootLayout({
