@@ -189,7 +189,7 @@ export default function Home() {
             </div>
           </div>
           <p className="text-xs text-charcoal/60">
-            © {new Date().getFullYear()} HeyLola · {t("footer.challenge")}
+            © 2026 HeyLola · {t("footer.challenge")}
           </p>
         </div>
       </footer>
