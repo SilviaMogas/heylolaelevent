@@ -184,9 +184,12 @@ function VoicePanelInner({
   const pendingSent = useRef(false);
   // Texts already rendered as user bubbles locally — dedupe SDK echoes.
   const pendingEchoes = useRef<string[]>([]);
+  // Last pushed line — dedupe the SDK's repeated agent_response frames.
+  const lastPushed = useRef<{ role: string; text: string } | null>(null);
 
   const pushLine = useCallback(
     (line: TranscriptLine) => {
+      lastPushed.current = { role: line.role, text: line.text.trim() };
       setLines((prev) => {
         if (keepTranscript) return [...prev, line];
         // Data minimisation: only keep the last two lines.
@@ -230,6 +233,11 @@ function VoicePanelInner({
             pendingEchoes.current.splice(i, 1);
             return;
           }
+        } else if (
+          lastPushed.current?.role === "agent" &&
+          lastPushed.current.text === m.message.trim()
+        ) {
+          return;
         }
         pushLine({
           role: m.source === "user" ? "user" : "agent",
@@ -260,6 +268,8 @@ function VoicePanelInner({
   }, [lang, pushLine, clientToolHandlers]);
 
   const begin = async () => {
+    pendingEchoes.current = [];
+    lastPushed.current = null;
     setState("connecting");
     try {
       const res = await fetch("/api/elevenlabs/signed-url");
@@ -292,6 +302,7 @@ function VoicePanelInner({
 
   const end = () => {
     pendingEchoes.current = [];
+    lastPushed.current = null;
     mockRef.current?.end();
     mockRef.current = null;
     stopPlayback();
