@@ -14,7 +14,11 @@ export const AUTHORITY_CONTACT = {
   name: { en: "Dubai Municipality", ar: "بلدية دبي" },
   phone: "800 900",
   url: "https://www.dm.gov.ae/",
-  apps: ["Dubai Municipality app", "DubaiNow", "Aleef"],
+  apps: [
+    { en: "Dubai Municipality app", ar: "تطبيق بلدية دبي" },
+    { en: "DubaiNow", ar: "دبي الآن" },
+    { en: "Aleef", ar: "أليف" },
+  ],
 } as const;
 
 export interface AnsweredStep {

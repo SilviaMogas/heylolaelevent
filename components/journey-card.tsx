@@ -16,7 +16,7 @@ const CHIP_STYLE: Record<Verification, string> = {
 };
 
 export function AuthorityBlock() {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   return (
     <div className="mt-3 rounded-md bg-cream p-3 text-sm">
       <p className="font-semibold">{t("authority.contactHeading")}</p>
@@ -30,7 +30,9 @@ export function AuthorityBlock() {
           dm.gov.ae
         </a>
       </p>
-      <p className="text-charcoal/70">{AUTHORITY_CONTACT.apps.join(" · ")}</p>
+      <p className="text-charcoal/70">
+        {AUTHORITY_CONTACT.apps.map((a) => a[lang]).join(" · ")}
+      </p>
     </div>
   );
 }

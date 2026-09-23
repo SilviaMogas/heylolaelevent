@@ -31,7 +31,7 @@ interface PanelEvents {
 }
 
 function HandoverCard() {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   return (
     <div className="rounded-lg border border-brand/50 bg-cream p-4 text-sm">
       <p className="font-bold">{t("voice.handover.title")}</p>
@@ -51,7 +51,7 @@ function HandoverCard() {
         </a>
       </p>
       <p className="text-charcoal/70">
-        {AUTHORITY_CONTACT.apps.join(" · ")}
+        {AUTHORITY_CONTACT.apps.map((a) => a[lang]).join(" · ")}
       </p>
       <p className="mt-1 text-charcoal/70">
         {t("voice.handover.heylola")}
@@ -232,6 +232,7 @@ function VoicePanelInner({
   const close = useCallback(() => {
     end();
     onClose();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- end() reads only refs and stable setters
   }, [onClose]);
 
   // Focus trap + Esc, active in every state while the dialog is open.
@@ -488,7 +489,7 @@ function VoicePanelInner({
                       onClick={() => playSynthetic(c.id)}
                       className="min-h-11 rounded-full bg-cream px-3 text-xs font-semibold hover:bg-sunny/40"
                     >
-                      {t("voice.demo.play")}: {c.label.en}
+                      {t("voice.demo.play")}: {c.label[lang]}
                     </button>
                   ))}
                 </div>

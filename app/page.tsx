@@ -93,7 +93,7 @@ export default function Home() {
             </a>
           </p>
           <p className="text-sm text-charcoal/70">
-            {AUTHORITY_CONTACT.apps.join(" · ")}
+            {AUTHORITY_CONTACT.apps.map((a) => a[lang]).join(" · ")}
           </p>
           <p className="mt-3 text-sm text-charcoal/80">
             {t("voice.handover.heylola")}
