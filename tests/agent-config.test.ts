@@ -29,6 +29,23 @@ describe("agent payload", () => {
     ).toContain("800 900");
   });
 
+  it("uses the multilingual TTS model and built-in language detection", () => {
+    const payload = buildAgentPayload({} as NodeJS.ProcessEnv);
+    const cc = payload.conversation_config;
+    expect(cc.tts.model_id).toBe("eleven_flash_v2");
+    expect(
+      cc.language_presets.ar.overrides.tts.model_id,
+    ).toBe("eleven_flash_v2_5");
+    expect(
+      cc.agent.prompt.built_in_tools.language_detection.params
+        .system_tool_type,
+    ).toBe("language_detection");
+    expect(
+      cc.agent.prompt.built_in_tools.end_call.params.system_tool_type,
+    ).toBe("end_call");
+    expect(cc.turn).toEqual({ turn_timeout: 7, mode: "turn" });
+  });
+
   it("system prompt contains reviewed source urls", () => {
     expect(buildSystemPrompt("en")).toContain("dm.gov.ae");
   });

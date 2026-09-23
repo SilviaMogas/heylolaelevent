@@ -129,8 +129,23 @@ export function buildAgentPayload(env: NodeJS.ProcessEnv = process.env) {
           llm: "gemini-2.5-flash",
           temperature: 0.2,
           tools,
+          built_in_tools: {
+            language_detection: {
+              name: "language_detection",
+              description:
+                "Switch the conversation language when the dog parent speaks English or Arabic.",
+              params: { system_tool_type: "language_detection" },
+            },
+            end_call: {
+              name: "end_call",
+              description:
+                "End the call when the dog parent says goodbye or has no more questions.",
+              params: { system_tool_type: "end_call" },
+            },
+          },
         },
       },
+      turn: { turn_timeout: 7, mode: "turn" },
       language_presets: {
         ar: {
           overrides: {
@@ -141,11 +156,19 @@ export function buildAgentPayload(env: NodeJS.ProcessEnv = process.env) {
                 prompt: buildSystemPrompt("ar"),
               },
             },
+            // English-only models are enforced for en agents; the ar preset
+            // gets the multilingual v2.5 model for real Arabic speech.
+            tts: {
+              model_id: "eleven_flash_v2_5",
+              optimize_streaming_latency: 3,
+            },
           },
         },
       },
       tts: {
         voice_id: env.ELEVENLABS_VOICE_ID ?? DEFAULT_VOICE_ID,
+        model_id: "eleven_flash_v2",
+        optimize_streaming_latency: 3,
       },
       conversation: {
         max_duration_seconds: 600,
