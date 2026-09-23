@@ -3,6 +3,7 @@
 import { useCallback, useState } from "react";
 import { useLang } from "@/components/lang-provider";
 import { SiteHeader } from "@/components/site-header";
+import { Wordmark } from "@/components/wordmark";
 import { DistinctionBanner, JourneyCard } from "@/components/journey-card";
 import { VoicePanelLauncher } from "@/components/voice/voice-panel";
 import { LolaOrb } from "@/components/lola-orb";
@@ -152,13 +153,44 @@ export default function Home() {
               </li>
             ))}
           </ul>
-          <p className="text-sm">
-            {t("footer.contact")}:{" "}
-            <a href="mailto:hey@heylola.co" className="underline">
-              hey@heylola.co
-            </a>
-          </p>
           <p className="text-xs text-charcoal/60">{t("footer.disclaimer")}</p>
+          <div className="flex flex-wrap items-center justify-between gap-4 border-t border-charcoal/10 pt-4">
+            <a
+              href="https://heylola.co"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex flex-col text-lg"
+            >
+              <Wordmark />
+              <span className="text-xs text-charcoal/60">
+                {t("footer.tagline")}
+              </span>
+            </a>
+            <div className="flex flex-wrap items-center gap-4 text-sm">
+              <a
+                href="https://heylola.co"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline"
+              >
+                {t("footer.visit")}
+              </a>
+              <a href="mailto:hey@heylola.co" className="underline">
+                hey@heylola.co
+              </a>
+              <a
+                href="https://github.com/SilviaMogas/heylolaelevent"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline"
+              >
+                {t("footer.source")}
+              </a>
+            </div>
+          </div>
+          <p className="text-xs text-charcoal/60">
+            © 2026 HeyLola · {t("footer.challenge")}
+          </p>
         </div>
       </footer>
     </div>
