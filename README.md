@@ -158,7 +158,19 @@ routing and handover, agent payload shape, and voice-panel consent/demo flow.
 
 Set `ELEVENLABS_API_KEY`, `ELEVENLABS_AGENT_ID` (and optionally
 `ELEVENLABS_VOICE_ID`) as environment variables in Vercel.
+Check `https://<domain>/api/health` to confirm both variables are present
+(`voice: "live"`, `agentConfigured`/`keyConfigured` — values are never
+returned).
 **Do not deploy this repo to any production HeyLola property.**
+
+## Voice quality
+
+- TTS model `eleven_flash_v2_5` (multilingual, EN/AR) via the Arabic language
+  preset; English uses `eleven_flash_v2`. `optimize_streaming_latency: 3`.
+- Built-in system tools: `language_detection` (switch EN ↔ AR mid-call) and
+  `end_call` (hang up on goodbye).
+- The live panel has a microphone mute toggle, a listening/speaking/muted
+  status pill and an input-level meter.
 
 ## Configuring the ElevenLabs agent
 
