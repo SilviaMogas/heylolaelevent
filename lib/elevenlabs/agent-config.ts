@@ -165,7 +165,7 @@ export function buildAgentPayload(env: NodeJS.ProcessEnv = process.env) {
       },
       privacy: {
         record_voice: false,
-        retention_days: 0,
+        retention_days: -1,
         delete_transcript_and_pii: true,
         delete_audio: true,
         zero_retention_mode: true,
