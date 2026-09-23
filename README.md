@@ -158,9 +158,8 @@ routing and handover, agent payload shape, and voice-panel consent/demo flow.
 
 Set `ELEVENLABS_API_KEY`, `ELEVENLABS_AGENT_ID` (and optionally
 `ELEVENLABS_VOICE_ID`) as environment variables in Vercel.
-Check `https://<domain>/api/health` to confirm both variables are present
-(`voice: "live"`, `agentConfigured`/`keyConfigured` — values are never
-returned).
+Check `https://<domain>/api/health`: `voice: "live"` means both variables
+are present (the endpoint never reports which one is missing, nor values).
 **Do not deploy this repo to any production HeyLola property.**
 
 ## Voice quality

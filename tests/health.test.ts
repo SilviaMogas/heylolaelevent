@@ -16,8 +16,6 @@ describe("GET /api/health", () => {
     expect(body).toEqual({
       ok: true,
       voice: "demo",
-      agentConfigured: false,
-      keyConfigured: false,
     });
   });
 
@@ -29,8 +27,6 @@ describe("GET /api/health", () => {
     expect(body).toEqual({
       ok: true,
       voice: "live",
-      agentConfigured: true,
-      keyConfigured: true,
     });
     // Never leaks the values themselves.
     expect(JSON.stringify(body)).not.toContain('"k"');
