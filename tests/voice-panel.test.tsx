@@ -61,4 +61,16 @@ describe("VoicePanel", () => {
       screen.getByRole("link", { name: /talk to a human/i }),
     ).toBeInTheDocument();
   });
+
+  it("Escape closes the dialog and returns focus to the CTA", async () => {
+    renderPanel();
+    const cta = screen.getByRole("button", { name: /ask about adoption/i });
+    fireEvent.click(cta);
+    await screen.findByRole("dialog");
+    fireEvent.keyDown(window, { key: "Escape" });
+    await waitFor(() =>
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument(),
+    );
+    expect(document.activeElement).toBe(cta);
+  });
 });

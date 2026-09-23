@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useLang } from "@/components/lang-provider";
 import {
   AUTHORITY_CONTACT,
@@ -17,7 +16,7 @@ const CHIP_STYLE: Record<Verification, string> = {
 };
 
 export function AuthorityBlock() {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   return (
     <div className="mt-3 rounded-md bg-cream p-3 text-sm">
       <p className="font-semibold">{t("authority.contactHeading")}</p>
@@ -31,7 +30,9 @@ export function AuthorityBlock() {
           dm.gov.ae
         </a>
       </p>
-      <p className="text-charcoal/70">{AUTHORITY_CONTACT.apps.join(" · ")}</p>
+      <p className="text-charcoal/70">
+        {AUTHORITY_CONTACT.apps.map((a) => a[lang]).join(" · ")}
+      </p>
     </div>
   );
 }
@@ -39,12 +40,15 @@ export function AuthorityBlock() {
 export function JourneyCard({
   journeyId,
   highlight,
+  open,
+  onOpenChange,
 }: {
   journeyId: JourneyId;
   highlight?: boolean;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }) {
   const { lang, t } = useLang();
-  const [open, setOpen] = useState(false);
   const guidance = getGuidance(journeyId, lang);
   const today = new Date();
 
@@ -63,7 +67,7 @@ export function JourneyCard({
         type="button"
         aria-expanded={open}
         aria-controls={`steps-${journeyId}`}
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => onOpenChange(!open)}
         className="mt-3 min-h-11 rounded-md bg-cream px-4 text-sm font-semibold hover:bg-sunny/40"
       >
         {t("journeys.steps")} ({guidance.steps.length})

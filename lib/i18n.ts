@@ -71,6 +71,7 @@ export const dict: Record<Lang, Record<string, string>> = {
     "voice.handover.title": "For anything Lola can't verify",
     "voice.handover.heylola":
       "For HeyLola profile questions only: hey@heylola.co",
+    "voice.sources": "Sources",
     "voice.you": "You",
     "voice.lola": "Lola",
     "handover.heading": "Talk to a human or an official service",
@@ -143,6 +144,7 @@ export const dict: Record<Lang, Record<string, string>> = {
     "voice.handover.title": "لأي شيء لا تستطيع لولا التحقق منه",
     "voice.handover.heylola":
       "لأسئلة ملف HeyLola فقط: hey@heylola.co",
+    "voice.sources": "المصادر",
     "voice.you": "أنت",
     "voice.lola": "لولا",
     "handover.heading": "تحدّث إلى إنسان أو خدمة رسمية",
