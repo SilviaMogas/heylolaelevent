@@ -5,6 +5,7 @@ import { useLang } from "@/components/lang-provider";
 import { SiteHeader } from "@/components/site-header";
 import { DistinctionBanner, JourneyCard } from "@/components/journey-card";
 import { VoicePanelLauncher } from "@/components/voice/voice-panel";
+import { LolaOrb } from "@/components/lola-orb";
 import { AUTHORITY_CONTACT, SOURCES } from "@/lib/lemon";
 import type { JourneyId } from "@/lib/lemon";
 
@@ -13,6 +14,7 @@ const JOURNEY_IDS: JourneyId[] = ["adopt", "register", "profile"];
 export default function Home() {
   const { t, lang } = useLang();
   const [highlighted, setHighlighted] = useState<JourneyId | null>(null);
+  const [pendingQuestion, setPendingQuestion] = useState<string | null>(null);
   const [openCards, setOpenCards] = useState<Record<JourneyId, boolean>>({
     adopt: false,
     register: false,
@@ -32,17 +34,39 @@ export default function Home() {
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
-      <main className="mx-auto w-full max-w-6xl flex-1 space-y-10 px-6 py-8">
-        <section className="space-y-4">
-          <h1 className="max-w-2xl text-3xl font-black leading-tight sm:text-4xl">
-            {t("hero.title")}
-          </h1>
-          <p className="text-lg text-charcoal/80">{t("brand.tagline")}</p>
-          <VoicePanelLauncher
-            onShowSources={showSources}
-            onOpenProfileGuide={openProfileGuide}
-          />
-          <p className="text-sm text-charcoal/60">{t("hero.aiDisclosure")}</p>
+      <main className="mx-auto w-full max-w-6xl flex-1 space-y-16 px-6 py-8">
+        <section className="grid items-center gap-10 md:grid-cols-[1.2fr_1fr]">
+          <div className="space-y-4">
+            <h1 className="max-w-2xl text-4xl font-black leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">
+              {t("hero.title")}
+            </h1>
+            <p className="text-lg text-charcoal/80">{t("brand.tagline")}</p>
+            <VoicePanelLauncher
+              onShowSources={showSources}
+              onOpenProfileGuide={openProfileGuide}
+              pendingQuestion={pendingQuestion}
+              onPendingConsumed={() => setPendingQuestion(null)}
+            />
+            <p className="text-sm text-charcoal/60">{t("hero.aiDisclosure")}</p>
+          </div>
+          <div className="flex flex-col items-center rounded-3xl border border-charcoal/10 bg-white/80 p-8 text-center shadow-xl backdrop-blur">
+            <LolaOrb state="idle" />
+            <p className="mt-5 text-sm font-semibold text-charcoal/80">
+              {t("hero.lolaLabel")}
+            </p>
+            <div className="mt-4 flex flex-col gap-2">
+              {[1, 2, 3].map((i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => setPendingQuestion(t(`hero.suggest.${i}`))}
+                  className="min-h-11 rounded-full bg-cream px-4 text-sm font-medium text-charcoal transition hover:bg-sunny/40"
+                >
+                  {t(`hero.suggest.${i}`)}
+                </button>
+              ))}
+            </div>
+          </div>
         </section>
 
         <DistinctionBanner />
@@ -52,9 +76,10 @@ export default function Home() {
             {t("journeys.heading")}
           </h2>
           <div className="grid gap-4 md:grid-cols-3">
-            {JOURNEY_IDS.map((id) => (
+            {JOURNEY_IDS.map((id, index) => (
               <JourneyCard
                 key={id}
+                index={index}
                 journeyId={id}
                 highlight={highlighted === id}
                 open={openCards[id]}
@@ -109,7 +134,7 @@ export default function Home() {
       <footer className="border-t border-charcoal/10 bg-cream">
         <div className="mx-auto max-w-6xl space-y-4 px-6 py-8">
           <h2 className="font-bold">{t("footer.sources")}</h2>
-          <ul className="space-y-1 text-sm">
+          <ul className="grid gap-3 text-sm sm:grid-cols-2">
             {SOURCES.map((s) => (
               <li key={s.id} className="flex flex-wrap gap-2">
                 <a

@@ -42,11 +42,13 @@ export function JourneyCard({
   highlight,
   open,
   onOpenChange,
+  index,
 }: {
   journeyId: JourneyId;
   highlight?: boolean;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  index: number;
 }) {
   const { lang, t } = useLang();
   const guidance = getGuidance(journeyId, lang);
@@ -55,11 +57,14 @@ export function JourneyCard({
   return (
     <article
       id={`journey-${journeyId}`}
-      className={`rounded-xl border bg-white p-5 shadow-sm transition-shadow ${
-        highlight ? "border-brand ring-2 ring-brand/40" : "border-charcoal/10"
+      className={`rounded-2xl border-t-4 border-brand bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${
+        highlight ? "ring-2 ring-brand/40" : ""
       }`}
     >
-      <h3 className="text-lg font-bold">{guidance.journey.title[lang]}</h3>
+      <p className="text-xs font-black tracking-widest text-brand">
+        {String(index + 1).padStart(2, "0")}
+      </p>
+      <h3 className="mt-1 text-lg font-bold">{guidance.journey.title[lang]}</h3>
       <p className="mt-1 text-sm text-charcoal/80">
         {guidance.journey.summary[lang]}
       </p>
@@ -128,14 +133,28 @@ export function DistinctionBanner() {
       aria-label="Dubai Municipality vs HeyLola"
       className="rounded-xl border border-charcoal/10 bg-cream p-5"
     >
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="relative grid gap-4 sm:grid-cols-2 sm:gap-8">
+        <span
+          aria-hidden="true"
+          className="absolute inset-x-0 top-1/2 hidden -translate-y-1/2 border-t border-charcoal/10 sm:block"
+        />
+        <span
+          aria-hidden="true"
+          className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand px-2 py-0.5 text-xs font-black text-charcoal sm:block"
+        >
+          vs
+        </span>
         <div>
-          <h3 className="font-bold">{t("distinction.dm.title")}</h3>
-          <p className="text-sm text-charcoal/80">{t("distinction.dm.body")}</p>
+          <h3 className="inline-block rounded-full bg-charcoal px-3 py-1 text-sm font-bold text-bone">
+            {t("distinction.dm.title")}
+          </h3>
+          <p className="mt-2 text-sm text-charcoal/80">{t("distinction.dm.body")}</p>
         </div>
         <div>
-          <h3 className="font-bold">{t("distinction.hl.title")}</h3>
-          <p className="text-sm text-charcoal/80">{t("distinction.hl.body")}</p>
+          <h3 className="inline-block rounded-full bg-brand px-3 py-1 text-sm font-bold text-charcoal">
+            {t("distinction.hl.title")}
+          </h3>
+          <p className="mt-2 text-sm text-charcoal/80">{t("distinction.hl.body")}</p>
         </div>
       </div>
       <p className="mt-4 border-t border-charcoal/10 pt-3 text-sm">
