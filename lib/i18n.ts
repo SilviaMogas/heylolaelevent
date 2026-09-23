@@ -75,6 +75,10 @@ export const dict: Record<Lang, Record<string, string>> = {
     "voice.status.demo": "Demo mode — synthetic answers, no audio",
     "voice.mute": "Mute microphone",
     "voice.unmute": "Unmute microphone",
+    "voice.listening": "Lola is listening",
+    "voice.speaking": "Lola is speaking",
+    "voice.muted": "Microphone muted",
+    "voice.micLevel": "Microphone level",
     "voice.minimisation":
       "We don't ask for names, IDs or documents. Nothing is saved after you close this page.",
     "voice.human": "Talk to a human / official service",
@@ -162,6 +166,10 @@ export const dict: Record<Lang, Record<string, string>> = {
     "voice.status.demo": "وضع تجريبي — إجابات مُعدّة، بلا صوت",
     "voice.mute": "كتم الميكروفون",
     "voice.unmute": "إلغاء كتم الميكروفون",
+    "voice.listening": "لولا تستمع",
+    "voice.speaking": "لولا تتحدث",
+    "voice.muted": "الميكروفون مكتوم",
+    "voice.micLevel": "مستوى الميكروفون",
     "voice.minimisation":
       "لا نطلب أسماء أو هويات أو مستندات. لا يُحفَظ شيء بعد إغلاق هذه الصفحة.",
     "voice.human": "تحدّث إلى إنسان / خدمة رسمية",
