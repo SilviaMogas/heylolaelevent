@@ -3,6 +3,7 @@
 import { useCallback, useState } from "react";
 import { useLang } from "@/components/lang-provider";
 import { SiteHeader } from "@/components/site-header";
+import { Wordmark } from "@/components/wordmark";
 import { DistinctionBanner, JourneyCard } from "@/components/journey-card";
 import { VoicePanelLauncher } from "@/components/voice/voice-panel";
 import { LolaOrb } from "@/components/lola-orb";
@@ -158,11 +159,9 @@ export default function Home() {
               href="https://heylola.co"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex flex-col"
+              className="flex flex-col text-lg"
             >
-              <span className="text-lg font-black italic tracking-tight">
-                HeyLola<span className="brand-dot" aria-hidden="true" />
-              </span>
+              <Wordmark />
               <span className="text-xs text-charcoal/60">
                 {t("footer.tagline")}
               </span>
