@@ -121,7 +121,7 @@ the step `needsAuthority`.
   the last two lines are held in state.
 - Data minimisation: no names, IDs or documents are requested; nothing is
   persisted after the page closes.
-- The agent payload sets `record_voice: false`, `retention_days: 0`,
+- The agent payload sets `record_voice: false`, `retention_days: -1` (required by the API when `zero_retention_mode` is on),
   `delete_transcript_and_pii`, `delete_audio` and `zero_retention_mode`.
 
 ## Tests & checks
