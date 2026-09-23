@@ -10,6 +10,17 @@ body {
   @apply bg-bone text-charcoal antialiased;
 }
 
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(60vw 60vh at 100% 0%, rgb(251 193 95 / 0.25), transparent 60%),
+    radial-gradient(50vw 50vh at 0% 100%, rgb(242 140 51 / 0.1), transparent 60%);
+}
+
 .brand-dot {
   display: inline-block;
   width: 0.28em;
@@ -20,4 +31,115 @@ body {
 
 [dir="rtl"] .flip-rtl {
   transform: scaleX(-1);
+}
+
+/* ——— Lola orb ——— */
+.orb-core {
+  position: relative;
+}
+
+@keyframes orb-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
+}
+
+.orb-breathe {
+  animation: orb-breathe 4s ease-in-out infinite;
+}
+
+@keyframes orb-speak {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+.orb-speak {
+  animation: orb-speak 0.8s ease-in-out infinite;
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+.pulse-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgb(242 140 51 / 0.6);
+  animation: pulse-ring 2s ease-out infinite;
+}
+
+.orb-thinking-ring {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, transparent 0 70%, #f28c33 100%);
+  -webkit-mask:
+    radial-gradient(farthest-side, transparent calc(100% - 3px), black 0);
+  mask: radial-gradient(farthest-side, transparent calc(100% - 3px), black 0);
+  animation: orb-spin 2.4s linear infinite;
+}
+
+@keyframes orb-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes cta-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1.25);
+    opacity: 0;
+  }
+}
+
+.cta-pulse::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  border: 2px solid rgb(242 140 51 / 0.7);
+  animation: cta-pulse 2.4s ease-out infinite;
+  pointer-events: none;
+}
+
+@keyframes bars {
+  0%,
+  100% {
+    transform: scaleY(0.4);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orb-breathe,
+  .orb-speak,
+  .orb-thinking-ring,
+  .pulse-ring,
+  .cta-pulse::after,
+  [class*="animate-[bars"] {
+    animation: none !important;
+  }
 }
