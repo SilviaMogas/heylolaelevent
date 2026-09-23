@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useLang } from "@/components/lang-provider";
 import {
   AUTHORITY_CONTACT,
@@ -39,12 +38,15 @@ export function AuthorityBlock() {
 export function JourneyCard({
   journeyId,
   highlight,
+  open,
+  onOpenChange,
 }: {
   journeyId: JourneyId;
   highlight?: boolean;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }) {
   const { lang, t } = useLang();
-  const [open, setOpen] = useState(false);
   const guidance = getGuidance(journeyId, lang);
   const today = new Date();
 
@@ -63,7 +65,7 @@ export function JourneyCard({
         type="button"
         aria-expanded={open}
         aria-controls={`steps-${journeyId}`}
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => onOpenChange(!open)}
         className="mt-3 min-h-11 rounded-md bg-cream px-4 text-sm font-semibold hover:bg-sunny/40"
       >
         {t("journeys.steps")} ({guidance.steps.length})

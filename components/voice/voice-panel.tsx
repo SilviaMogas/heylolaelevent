@@ -7,7 +7,7 @@ import { createMockConversation } from "@/lib/mock-agent";
 import type { MockConversation } from "@/lib/mock-agent";
 import { SYNTHETIC_CONVERSATIONS } from "@/lib/demo/synthetic";
 import { AUTHORITY_CONTACT } from "@/lib/lemon";
-import type { JourneyId, Lang } from "@/lib/lemon";
+import type { JourneyId, Lang, Source } from "@/lib/lemon";
 
 type PanelState =
   | "idle"
@@ -22,6 +22,7 @@ type PanelState =
 interface TranscriptLine {
   role: "agent" | "user";
   text: string;
+  sources?: Source[];
 }
 
 interface PanelEvents {
@@ -62,9 +63,23 @@ function HandoverCard() {
 export function VoicePanelLauncher(events: PanelEvents) {
   const [open, setOpen] = useState(false);
   const { t } = useLang();
+  const launcherRef = useRef<HTMLButtonElement>(null);
+  const wasOpen = useRef(false);
+
+  // Return focus to the CTA after the dialog closes (Esc, ×, Cancel).
+  useEffect(() => {
+    if (open) {
+      wasOpen.current = true;
+    } else if (wasOpen.current) {
+      wasOpen.current = false;
+      launcherRef.current?.focus();
+    }
+  }, [open]);
+
   return (
     <>
       <button
+        ref={launcherRef}
         type="button"
         onClick={() => setOpen(true)}
         className="inline-flex min-h-12 items-center gap-2 rounded-full bg-brand px-6 text-base font-bold text-charcoal shadow hover:bg-sunny"
@@ -181,7 +196,11 @@ function VoicePanelInner({
       }
       if (!res.ok) throw new Error(`signed-url ${res.status}`);
       const { signedUrl } = (await res.json()) as { signedUrl: string };
-      await navigator.mediaDevices.getUserMedia({ audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+      });
+      // The SDK opens its own stream; release this one immediately.
+      stream.getTracks().forEach((track) => track.stop());
       await conversation.startSession({
         signedUrl,
         overrides: { agent: { language: lang } },
@@ -201,6 +220,7 @@ function VoicePanelInner({
   const end = () => {
     mockRef.current?.end();
     mockRef.current = null;
+    stopPlayback();
     try {
       conversation.endSession();
     } catch {
@@ -209,23 +229,38 @@ function VoicePanelInner({
     setState("ended");
   };
 
-  // Focus trap + Esc for the consent dialog.
+  const close = useCallback(() => {
+    end();
+    onClose();
+  }, [onClose]);
+
+  // Focus trap + Esc, active in every state while the dialog is open.
   useEffect(() => {
-    if (state !== "consent") return;
     const root = dialogRef.current;
-    root?.querySelector<HTMLElement>("input, button")?.focus();
+    if (state === "consent") {
+      root?.querySelector<HTMLElement>("input, button")?.focus();
+    }
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") close();
       if (e.key === "Tab" && root) {
         const focusables = root.querySelectorAll<HTMLElement>(
           "input, button, a[href]",
         );
+        if (focusables.length === 0) return;
         const first = focusables[0];
         const last = focusables[focusables.length - 1];
-        if (e.shiftKey && document.activeElement === first) {
+        if (
+          e.shiftKey &&
+          (document.activeElement === first ||
+            !root.contains(document.activeElement))
+        ) {
           e.preventDefault();
           last.focus();
-        } else if (!e.shiftKey && document.activeElement === last) {
+        } else if (
+          !e.shiftKey &&
+          (document.activeElement === last ||
+            !root.contains(document.activeElement))
+        ) {
           e.preventDefault();
           first.focus();
         }
@@ -233,25 +268,46 @@ function VoicePanelInner({
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [state, onClose]);
+  }, [state, close]);
 
-  useEffect(() => () => mockRef.current?.end(), []);
+  // Synthetic playback timers: all ids are kept so they can be cancelled;
+  // a generation counter invalidates callbacks from earlier playbacks.
+  const playbackTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const playbackGen = useRef(0);
+
+  const stopPlayback = useCallback(() => {
+    playbackGen.current += 1;
+    for (const id of playbackTimers.current) clearTimeout(id);
+    playbackTimers.current = [];
+  }, []);
+
+  useEffect(
+    () => () => {
+      mockRef.current?.end();
+      stopPlayback();
+    },
+    [stopPlayback],
+  );
 
   const playSynthetic = (id: string) => {
     const script = SYNTHETIC_CONVERSATIONS.find((c) => c.id === id);
     const mock = mockRef.current;
     if (!script || !mock) return;
     mock.setLang(script.lang);
+    stopPlayback();
+    const gen = playbackGen.current;
     let delay = 0;
     for (const line of script.lines) {
       const d = delay;
       delay += line.role === "user" ? 300 : 1400;
-      setTimeout(() => {
+      const timer = setTimeout(() => {
+        if (gen !== playbackGen.current) return;
         pushLine({ role: line.role, text: line.text });
         line.tools?.forEach((tool) =>
           clientToolHandlers(tool.name, tool.parameters),
         );
       }, d + (line.role === "agent" ? 500 : 0));
+      playbackTimers.current.push(timer);
     }
   };
 
@@ -271,10 +327,7 @@ function VoicePanelInner({
           <h2 className="text-lg font-bold">{t("voice.title")}</h2>
           <button
             type="button"
-            onClick={() => {
-              end();
-              onClose();
-            }}
+            onClick={close}
             className="min-h-11 min-w-11 rounded-md text-2xl leading-none hover:bg-cream"
             aria-label={t("voice.close")}
           >
@@ -367,12 +420,34 @@ function VoicePanelInner({
               aria-label="transcript"
             >
               {lines.map((line, i) => (
-                <p key={i} className="text-sm">
-                  <strong>
-                    {line.role === "agent" ? t("voice.lola") : t("voice.you")}:{" "}
-                  </strong>
-                  {line.text}
-                </p>
+                <div key={i}>
+                  <p className="text-sm">
+                    <strong>
+                      {line.role === "agent" ? t("voice.lola") : t("voice.you")}:{" "}
+                    </strong>
+                    {line.text}
+                  </p>
+                  {line.sources && line.sources.length > 0 && (
+                    <ul className="ms-4 mt-1 space-y-0.5 text-xs text-charcoal/70">
+                      <li className="font-semibold">{t("voice.sources")}:</li>
+                      {line.sources.map((s) => (
+                        <li key={s.id}>
+                          <a
+                            href={s.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="underline decoration-brand decoration-2 underline-offset-2"
+                          >
+                            {s.title[lang]}
+                          </a>{" "}
+                          <span className="text-charcoal/50">
+                            ({t("source.reviewed")} {s.reviewedOn})
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
               ))}
             </div>
 

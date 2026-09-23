@@ -28,6 +28,8 @@ export interface Step {
   sourceIds: SourceId[];
   verification: Verification;
   authority: Authority;
+  /** Optional utterance keywords for step-level routing (findRelevantSteps). */
+  keywords?: Record<Lang, string[]>;
 }
 
 export interface Journey {
@@ -78,6 +80,7 @@ export const JOURNEYS: readonly Journey[] = [
         sourceIds: [],
         verification: "unverified",
         authority: "shelter",
+        keywords: { en: ["shelter", "rescue"], ar: ["ملجأ", "إنقاذ"] },
       },
       {
         id: "adopt-then-register",
@@ -110,6 +113,7 @@ export const JOURNEYS: readonly Journey[] = [
         sourceIds: ["dm-veterinary", "e247-dm-vet-guide"],
         verification: "reported",
         authority: "vet_clinic",
+        keywords: { en: ["microchip", "chip"], ar: ["شريحة"] },
       },
       {
         id: "reg-vaccination",
@@ -121,6 +125,7 @@ export const JOURNEYS: readonly Journey[] = [
         sourceIds: ["e247-dm-vet-guide", "wam-dm-h1-2026"],
         verification: "reported",
         authority: "vet_clinic",
+        keywords: { en: ["vaccin", "rabies", "vaccine"], ar: ["تطعيم", "لقاح"] },
       },
       {
         id: "reg-apply",
@@ -165,6 +170,7 @@ export const JOURNEYS: readonly Journey[] = [
         sourceIds: ["dm-contact"],
         verification: "unverified",
         authority: "dubai_municipality",
+        keywords: { en: ["fine", "penalty", "penalties", "fee for late", "punish"], ar: ["غرامة", "غرامات", "مخالفة", "عقوبة"] },
       },
     ],
   },
@@ -186,6 +192,7 @@ export const JOURNEYS: readonly Journey[] = [
         sourceIds: [],
         verification: "official",
         authority: "heylola",
+        keywords: { en: ["profile", "create", "sign up"], ar: ["ملف", "إنشاء"] },
       },
       {
         id: "profile-official",
@@ -208,6 +215,7 @@ export const JOURNEYS: readonly Journey[] = [
         sourceIds: [],
         verification: "official",
         authority: "heylola",
+        keywords: { en: ["vaccination", "vet", "insurance", "medication", "reminder"], ar: ["تطعيم", "بيطري", "تأمين", "تذكير"] },
       },
       {
         id: "profile-update",

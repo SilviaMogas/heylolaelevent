@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   composeAnswer,
   findJourney,
+  findRelevantSteps,
   getGuidance,
   getSource,
   JOURNEYS,
@@ -50,5 +51,29 @@ describe("lemon answer", () => {
     expect(findJourney("أريد تبنّي كلب", "ar")).toBe("adopt");
     expect(findJourney("ما هو رقم الشريحة", "ar")).toBe("register");
     expect(findJourney("what is the weather", "en")).toBeNull();
+  });
+
+  it("routes an utterance about fines to the penalties step and hands over", () => {
+    const a = composeAnswer(
+      "register",
+      "en",
+      new Date(),
+      "What is the fine if I don't register my dog?",
+    );
+    expect(a.text).toContain("Penalties for not registering");
+    expect(a.handover).toBe(true);
+  });
+
+  it("still yields the first 3 registration steps for a generic question", () => {
+    const a = composeAnswer("register", "en", new Date(), "how do I register my dog");
+    expect(a.text).toContain("Microchip at a vet");
+    expect(a.text).toContain("Vaccination up to date");
+    expect(a.text).toContain("Apply for registration with Dubai Municipality");
+  });
+
+  it("findRelevantSteps matches only keyworded steps", () => {
+    const steps = findRelevantSteps("is there a fine?", "register", "en");
+    expect(steps.map((s) => s.id)).toEqual(["reg-penalties"]);
+    expect(findRelevantSteps("hello", "register", "en")).toEqual([]);
   });
 });

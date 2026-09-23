@@ -4,7 +4,7 @@
  * knowledge block and emits the same client-tool calls.
  */
 import { composeAnswer, findJourney } from "@/lib/lemon";
-import type { Lang } from "@/lib/lemon";
+import type { Lang, Source } from "@/lib/lemon";
 import { FIRST_MESSAGE } from "@/lib/elevenlabs/prompts";
 
 export interface MockToolCall {
@@ -14,7 +14,11 @@ export interface MockToolCall {
 
 export interface MockConversationOptions {
   lang: Lang;
-  onMessage?: (message: { role: "agent" | "user"; text: string }) => void;
+  onMessage?: (message: {
+    role: "agent" | "user";
+    text: string;
+    sources?: Source[];
+  }) => void;
   onToolCall?: (name: MockToolCall["name"], parameters: Record<string, unknown>) => void;
   /** Response delay in ms (tests can pass 0). */
   delayMs?: number;
@@ -53,9 +57,14 @@ export function createMockConversation({
           onToolCall?.("request_handover", { reason: text });
           return;
         }
-        const answer = composeAnswer(journey, lang);
-        onMessage?.({ role: "agent", text: answer.text });
+        const answer = composeAnswer(journey, lang, new Date(), text);
+        onMessage?.({ role: "agent", text: answer.text, sources: answer.sources });
         onToolCall?.("show_sources", { journey });
+        if (answer.handover) {
+          onToolCall?.("request_handover", {
+            reason: "Guidance requires authority verification",
+          });
+        }
         if (journey === "profile") {
           onToolCall?.("open_profile_guide", {});
         }

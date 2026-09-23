@@ -42,4 +42,21 @@ describe("mock agent", () => {
       journey: "register",
     });
   });
+
+  it("emits request_handover after show_sources when guidance needs authority", async () => {
+    const { convo, onToolCall, onMessage } = setup();
+    convo.send("what's the fine if I don't register my dog?");
+    await new Promise((r) => setTimeout(r, 10));
+    expect(onToolCall).toHaveBeenCalledWith("show_sources", {
+      journey: "register",
+    });
+    expect(onToolCall).toHaveBeenCalledWith("request_handover", {
+      reason: "Guidance requires authority verification",
+    });
+    // Agent message carries the cited sources.
+    const agentMsg = onMessage.mock.calls
+      .map((c) => c[0])
+      .find((m) => m.role === "agent");
+    expect(agentMsg?.sources?.length).toBeGreaterThan(0);
+  });
 });

@@ -103,10 +103,30 @@ export interface ComposedAnswer {
   handover: boolean;
 }
 
+/**
+ * Step-level routing: returns the journey's steps whose `keywords` match the
+ * utterance, in journey order. Case-insensitive substring match in either
+ * language (a stray Arabic word in an English sentence still routes).
+ */
+export function findRelevantSteps(
+  utterance: string,
+  journeyId: JourneyId,
+  lang: Lang,
+): Step[] {
+  const journey = getJourney(journeyId);
+  const haystack = utterance.toLowerCase();
+  const other: Lang = lang === "en" ? "ar" : "en";
+  return journey.steps.filter((step) =>
+    step.keywords?.[lang]?.some((k) => haystack.includes(k.toLowerCase())) ||
+    step.keywords?.[other]?.some((k) => haystack.includes(k.toLowerCase())),
+  );
+}
+
 export function composeAnswer(
   journeyId: JourneyId | null,
   lang: Lang,
   today: Date = new Date(),
+  utterance?: string,
 ): ComposedAnswer {
   if (journeyId === null) {
     return { text: HANDOVER_TEXT[lang], sources: [], handover: true };
@@ -117,7 +137,10 @@ export function composeAnswer(
   const sources = new Map<string, Source>();
   let anyUnverified = false;
 
-  for (const step of journey.steps.slice(0, 3)) {
+  const relevant = utterance ? findRelevantSteps(utterance, journeyId, lang) : [];
+  const steps = (relevant.length > 0 ? relevant : journey.steps).slice(0, 3);
+
+  for (const step of steps) {
     let line = step.title[lang];
     if (step.verification === "reported") line += REPORTED_SUFFIX[lang];
     if (step.verification === "unverified") {

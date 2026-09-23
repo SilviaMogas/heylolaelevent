@@ -8,12 +8,20 @@ import { VoicePanelLauncher } from "@/components/voice/voice-panel";
 import { AUTHORITY_CONTACT, SOURCES } from "@/lib/lemon";
 import type { JourneyId } from "@/lib/lemon";
 
+const JOURNEY_IDS: JourneyId[] = ["adopt", "register", "profile"];
+
 export default function Home() {
   const { t, lang } = useLang();
   const [highlighted, setHighlighted] = useState<JourneyId | null>(null);
+  const [openCards, setOpenCards] = useState<Record<JourneyId, boolean>>({
+    adopt: false,
+    register: false,
+    profile: false,
+  });
 
   const showSources = useCallback((journey: JourneyId) => {
     setHighlighted(journey);
+    setOpenCards((prev) => ({ ...prev, [journey]: true }));
     document
       .getElementById(`journey-${journey}`)
       ?.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -44,15 +52,17 @@ export default function Home() {
             {t("journeys.heading")}
           </h2>
           <div className="grid gap-4 md:grid-cols-3">
-            <JourneyCard journeyId="adopt" highlight={highlighted === "adopt"} />
-            <JourneyCard
-              journeyId="register"
-              highlight={highlighted === "register"}
-            />
-            <JourneyCard
-              journeyId="profile"
-              highlight={highlighted === "profile"}
-            />
+            {JOURNEY_IDS.map((id) => (
+              <JourneyCard
+                key={id}
+                journeyId={id}
+                highlight={highlighted === id}
+                open={openCards[id]}
+                onOpenChange={(open) =>
+                  setOpenCards((prev) => ({ ...prev, [id]: open }))
+                }
+              />
+            ))}
           </div>
         </section>
 
