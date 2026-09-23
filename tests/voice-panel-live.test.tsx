@@ -161,12 +161,16 @@ describe("VoicePanel — pending question & live mode", () => {
     stubMic();
     await startLivePanel();
 
-    typeAndSend("hello");
-    expect(sendUserMessage).toHaveBeenCalledWith("hello");
+    typeAndSend("first");
+    typeAndSend("second");
+    expect(sendUserMessage).toHaveBeenCalledWith("first");
+    expect(sendUserMessage).toHaveBeenCalledWith("second");
 
-    // SDK echoes our own text back — must not produce a second bubble.
-    capturedOptions.onMessage?.({ message: "hello", source: "user" });
-    expect(screen.getAllByText("hello")).toHaveLength(1);
+    // SDK echoes our own texts back — must not produce second bubbles.
+    capturedOptions.onMessage?.({ message: "first", source: "user" });
+    capturedOptions.onMessage?.({ message: "second", source: "user" });
+    expect(screen.getAllByText("first")).toHaveLength(1);
+    expect(screen.getAllByText("second")).toHaveLength(1);
 
     // A genuinely new user message still renders.
     capturedOptions.onMessage?.({ message: "other", source: "user" });
