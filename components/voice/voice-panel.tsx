@@ -34,6 +34,23 @@ interface PanelEvents {
   onPendingConsumed?: () => void;
 }
 
+/** Fire-and-forget write to /api/session; storage must never block the UI. */
+async function postSession(body: Record<string, unknown>): Promise<string | undefined> {
+  try {
+    const res = await fetch("/api/session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      keepalive: true,
+    });
+    if (res.status !== 200) return undefined;
+    const data = (await res.json()) as { conversationId?: string };
+    return data.conversationId;
+  } catch {
+    return undefined;
+  }
+}
+
 function HandoverCard() {
   const { t, lang } = useLang();
   return (
@@ -186,17 +203,27 @@ function VoicePanelInner({
   const pendingEchoes = useRef<string[]>([]);
   // Last pushed line — dedupe the SDK's repeated agent_response frames.
   const lastPushed = useRef<{ role: string; text: string } | null>(null);
+  const conversationId = useRef<Promise<string | undefined> | null>(null);
+
+  const record = useCallback((body: Record<string, unknown>) => {
+    conversationId.current?.then((id) => {
+      if (id) void postSession({ ...body, conversationId: id });
+    });
+  }, []);
 
   const pushLine = useCallback(
     (line: TranscriptLine) => {
       lastPushed.current = { role: line.role, text: line.text.trim() };
+      if (keepTranscript) {
+        record({ type: "message", role: line.role, text: line.text });
+      }
       setLines((prev) => {
         if (keepTranscript) return [...prev, line];
         // Data minimisation: only keep the last two lines.
         return [...prev, line].slice(-2);
       });
     },
-    [keepTranscript],
+    [keepTranscript, record],
   );
 
   const clientToolHandlers = useCallback(
@@ -207,11 +234,12 @@ function VoicePanelInner({
         setLang(parameters.language as Lang);
       } else if (name === "request_handover") {
         setHandover(true);
+        record({ type: "handover", lang, reason: parameters.reason });
       } else if (name === "open_profile_guide") {
         onOpenProfileGuide?.();
       }
     },
-    [onShowSources, onOpenProfileGuide, setLang],
+    [onShowSources, onOpenProfileGuide, setLang, lang, record],
   );
 
   const conversation = useConversation({
@@ -257,6 +285,12 @@ function VoicePanelInner({
 
   const startDemo = useCallback(() => {
     setState("demo");
+    conversationId.current = postSession({
+      type: "start",
+      mode: "demo",
+      lang,
+      keepTranscript,
+    });
     const mock = createMockConversation({
       lang,
       onMessage: pushLine,
@@ -265,7 +299,7 @@ function VoicePanelInner({
     });
     mockRef.current = mock;
     mock.start();
-  }, [lang, pushLine, clientToolHandlers]);
+  }, [lang, keepTranscript, pushLine, clientToolHandlers]);
 
   const begin = async () => {
     pendingEchoes.current = [];
@@ -284,6 +318,12 @@ function VoicePanelInner({
       });
       // The SDK opens its own stream; release this one immediately.
       stream.getTracks().forEach((track) => track.stop());
+      conversationId.current = postSession({
+        type: "start",
+        mode: "live",
+        lang,
+        keepTranscript,
+      });
       await conversation.startSession({
         signedUrl,
         overrides: { agent: { language: lang } },
@@ -311,6 +351,8 @@ function VoicePanelInner({
     } catch {
       /* not connected */
     }
+    record({ type: "end" });
+    conversationId.current = null;
     setState("ended");
   };
 

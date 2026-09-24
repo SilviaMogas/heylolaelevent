@@ -33,8 +33,28 @@ npm run dev
 | `ELEVENLABS_API_KEY`   | Server-side API key (signed URL + sync). Required.  |
 | `ELEVENLABS_AGENT_ID`  | Agent to run. Created by `npm run elevenlabs:sync`. |
 | `ELEVENLABS_VOICE_ID`  | Optional voice override when syncing the agent.     |
+| `SUPABASE_URL`         | Optional. Shared "Subirachs Ventures" project.      |
+| `SUPABASE_SERVICE_ROLE_KEY` | Optional, server-only. Enables `/api/session` storage. |
 
 No `NEXT_PUBLIC_*` variables are needed.
+
+## Storage (Supabase, schema `heylola_eleven`)
+
+Tables live in the shared Supabase project `dhvwycxkkbqzvmrkysym`, schema
+`heylola_eleven` (see `supabase/migrations/0001_heylola_eleven.sql`):
+
+- `conversations` — one row per voice/demo session: mode, language,
+  `keep_transcript`, `handover`, start/end times. No personal data.
+- `messages` — transcript lines, written **only** when the visitor ticked
+  "keep a transcript".
+- `leads` — handover requests (`request_handover` tool). The free-form reason is
+  kept only when the visitor opted into the transcript; otherwise it is `null`.
+
+The browser only talks to `POST /api/session`; the route writes with the
+service-role key. `anon` has no privileges on the schema. Without the two
+Supabase variables the route answers `204` and nothing is stored.
+The migration does not touch `pgrst.db_schemas` (shared list); the schema is
+already exposed in the project settings.
 
 ## Architecture
 

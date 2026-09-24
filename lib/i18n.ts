@@ -49,10 +49,10 @@ export const dict: Record<Lang, Record<string, string>> = {
     "voice.consent.ai":
       "Lola is an AI assistant, not a person and not a government service.",
     "voice.consent.processing":
-      "Your voice is sent to ElevenLabs for processing during the conversation. In demo mode nothing is recorded or sent.",
+      "Your voice is sent to ElevenLabs for processing during the conversation. In demo mode no audio is recorded or sent to ElevenLabs.",
     "voice.consent.agree": "I agree to a voice conversation",
     "voice.consent.transcript":
-      "Keep a transcript on this page for this session",
+      "Keep a transcript of this conversation (shown here and saved anonymously to help improve Lola)",
     "voice.consent.privacy": "Read the privacy & AI note",
     "voice.consent.start": "Start conversation",
     "voice.consent.cancel": "Cancel",
@@ -80,7 +80,7 @@ export const dict: Record<Lang, Record<string, string>> = {
     "voice.muted": "Microphone muted",
     "voice.micLevel": "Microphone level",
     "voice.minimisation":
-      "We don't ask for names, IDs or documents. Nothing is saved after you close this page.",
+      "We don't ask for names, IDs or documents. We only keep anonymous session stats (language, mode, handover) — and the transcript only if you tick the box above.",
     "voice.human": "Talk to a human / official service",
     "voice.handover.title": "For anything Lola can't verify",
     "voice.handover.heylola":
@@ -93,7 +93,7 @@ export const dict: Record<Lang, Record<string, string>> = {
       "Dubai Municipality handles official registration, records and any question Lola can't verify.",
     "privacy.heading": "Privacy & AI note",
     "privacy.body":
-      "Lola is an AI assistant. Voice is processed by ElevenLabs when you consent to a live call; demo mode sends nothing. We ask for no names, IDs or documents, and nothing is stored after you close this page.",
+      "Lola is an AI assistant. Voice is processed by ElevenLabs when you consent to a live call; demo mode sends no audio. We ask for no names, IDs or documents. We store anonymous session stats (language, mode, whether a handover happened) and the transcript only if you opt in.",
     "footer.sources": "Sources & review dates",
     "footer.disclaimer":
       "Challenge demo. Not affiliated with Dubai Municipality. Not the HeyLola product.",
@@ -141,9 +141,10 @@ export const dict: Record<Lang, Record<string, string>> = {
     "voice.consent.ai":
       "لولا مساعدة ذكاء اصطناعي، وليست شخصاً ولا خدمة حكومية.",
     "voice.consent.processing":
-      "يُرسَل صوتك إلى ElevenLabs للمعالجة أثناء المحادثة. في الوضع التجريبي لا يُسجَّل شيء ولا يُرسَل.",
+      "يُرسَل صوتك إلى ElevenLabs للمعالجة أثناء المحادثة. في الوضع التجريبي لا يُسجَّل أي صوت ولا يُرسَل إلى ElevenLabs.",
     "voice.consent.agree": "أوافق على محادثة صوتية",
-    "voice.consent.transcript": "احتفظ بنسخة نصية على هذه الصفحة لهذه الجلسة",
+    "voice.consent.transcript":
+      "احتفظ بنسخة نصية من هذه المحادثة (تُعرض هنا وتُحفَظ بشكل مجهول لتحسين لولا)",
     "voice.consent.privacy": "اقرأ ملاحظة الخصوصية والذكاء الاصطناعي",
     "voice.consent.start": "ابدأ المحادثة",
     "voice.consent.cancel": "إلغاء",
@@ -171,7 +172,7 @@ export const dict: Record<Lang, Record<string, string>> = {
     "voice.muted": "الميكروفون مكتوم",
     "voice.micLevel": "مستوى الميكروفون",
     "voice.minimisation":
-      "لا نطلب أسماء أو هويات أو مستندات. لا يُحفَظ شيء بعد إغلاق هذه الصفحة.",
+      "لا نطلب أسماء أو هويات أو مستندات. نحتفظ فقط بإحصاءات مجهولة للجلسة (اللغة، الوضع، التحويل) — وبالنسخة النصية فقط إذا حددت الخيار أعلاه.",
     "voice.human": "تحدّث إلى إنسان / خدمة رسمية",
     "voice.handover.title": "لأي شيء لا تستطيع لولا التحقق منه",
     "voice.handover.heylola":
@@ -184,7 +185,7 @@ export const dict: Record<Lang, Record<string, string>> = {
       "بلدية دبي مسؤولة عن التسجيل الرسمي والسجلات وعن أي سؤال لا تستطيع لولا التحقق منه.",
     "privacy.heading": "ملاحظة الخصوصية والذكاء الاصطناعي",
     "privacy.body":
-      "لولا مساعدة ذكاء اصطناعي. يُعالَج الصوت عبر ElevenLabs عند موافقتك على مكالمة مباشرة؛ أما الوضع التجريبي فلا يرسل شيئاً. لا نطلب أسماء أو هويات أو مستندات، ولا يُخزَّن شيء بعد إغلاق هذه الصفحة.",
+      "لولا مساعدة ذكاء اصطناعي. يُعالَج الصوت عبر ElevenLabs عند موافقتك على مكالمة مباشرة؛ أما الوضع التجريبي فلا يرسل أي صوت. لا نطلب أسماء أو هويات أو مستندات. نخزّن إحصاءات مجهولة للجلسة (اللغة، الوضع، حدوث تحويل) والنسخة النصية فقط إذا وافقت على ذلك.",
     "footer.sources": "المصادر وتواريخ المراجعة",
     "footer.disclaimer":
       "نسخة تحدٍّ تجريبية. لا صلة لها ببلدية دبي. ليست منتج HeyLola.",
