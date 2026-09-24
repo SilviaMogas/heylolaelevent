@@ -75,6 +75,10 @@ export const dict: Record<Lang, Record<string, string>> = {
     "voice.status.demo": "Demo mode — synthetic answers, no audio",
     "voice.mute": "Mute microphone",
     "voice.unmute": "Unmute microphone",
+    "voice.listening": "Lola is listening",
+    "voice.speaking": "Lola is speaking",
+    "voice.muted": "Microphone muted",
+    "voice.micLevel": "Microphone level",
     "voice.minimisation":
       "We don't ask for names, IDs or documents. We only keep anonymous session stats (language, mode, handover) — and the transcript only if you tick the box above.",
     "voice.human": "Talk to a human / official service",
@@ -91,9 +95,13 @@ export const dict: Record<Lang, Record<string, string>> = {
     "privacy.body":
       "Lola is an AI assistant. Voice is processed by ElevenLabs when you consent to a live call; demo mode sends no audio. We ask for no names, IDs or documents. We store anonymous session stats (language, mode, whether a handover happened) and the transcript only if you opt in.",
     "footer.sources": "Sources & review dates",
-    "footer.contact": "Contact",
     "footer.disclaimer":
       "Challenge demo. Not affiliated with Dubai Municipality. Not the HeyLola product.",
+    "footer.tagline": "Your dog's lifestyle concierge",
+    "footer.visit": "Visit heylola.co",
+    "footer.source": "Challenge source code",
+    "footer.challenge":
+      "ElevenLabs challenge demo — not an official Dubai Municipality service",
   },
   ar: {
     "brand.tagline": "كونسيرج أسلوب حياة كلبك.",
@@ -159,6 +167,10 @@ export const dict: Record<Lang, Record<string, string>> = {
     "voice.status.demo": "وضع تجريبي — إجابات مُعدّة، بلا صوت",
     "voice.mute": "كتم الميكروفون",
     "voice.unmute": "إلغاء كتم الميكروفون",
+    "voice.listening": "لولا تستمع",
+    "voice.speaking": "لولا تتحدث",
+    "voice.muted": "الميكروفون مكتوم",
+    "voice.micLevel": "مستوى الميكروفون",
     "voice.minimisation":
       "لا نطلب أسماء أو هويات أو مستندات. نحتفظ فقط بإحصاءات مجهولة للجلسة (اللغة، الوضع، التحويل) — وبالنسخة النصية فقط إذا حددت الخيار أعلاه.",
     "voice.human": "تحدّث إلى إنسان / خدمة رسمية",
@@ -175,8 +187,12 @@ export const dict: Record<Lang, Record<string, string>> = {
     "privacy.body":
       "لولا مساعدة ذكاء اصطناعي. يُعالَج الصوت عبر ElevenLabs عند موافقتك على مكالمة مباشرة؛ أما الوضع التجريبي فلا يرسل أي صوت. لا نطلب أسماء أو هويات أو مستندات. نخزّن إحصاءات مجهولة للجلسة (اللغة، الوضع، حدوث تحويل) والنسخة النصية فقط إذا وافقت على ذلك.",
     "footer.sources": "المصادر وتواريخ المراجعة",
-    "footer.contact": "تواصل",
     "footer.disclaimer":
       "نسخة تحدٍّ تجريبية. لا صلة لها ببلدية دبي. ليست منتج HeyLola.",
+    "footer.tagline": "كونسيرج أسلوب حياة كلبك",
+    "footer.visit": "زوروا heylola.co",
+    "footer.source": "كود مشروع التحدي",
+    "footer.challenge":
+      "عرض تجريبي لتحدي ElevenLabs — ليس خدمة رسمية لبلدية دبي",
   },
 };

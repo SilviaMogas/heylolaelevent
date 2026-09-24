@@ -140,7 +140,7 @@ the step `needsAuthority`.
   the last two lines are held in state.
 - Data minimisation: no names, IDs or documents are requested; nothing is
   persisted after the page closes.
-- The agent payload sets `record_voice: false`, `retention_days: 0`,
+- The agent payload sets `record_voice: false`, `retention_days: -1` (required by the API when `zero_retention_mode` is on),
   `delete_transcript_and_pii`, `delete_audio` and `zero_retention_mode`.
 
 ## Tests & checks
@@ -177,7 +177,18 @@ routing and handover, agent payload shape, and voice-panel consent/demo flow.
 
 Set `ELEVENLABS_API_KEY`, `ELEVENLABS_AGENT_ID` (and optionally
 `ELEVENLABS_VOICE_ID`) as environment variables in Vercel.
+Check `https://<domain>/api/health`: `voice: "live"` means both variables
+are present (the endpoint never reports which one is missing, nor values).
 **Do not deploy this repo to any production HeyLola property.**
+
+## Voice quality
+
+- TTS model `eleven_flash_v2_5` (multilingual, EN/AR) via the Arabic language
+  preset; English uses `eleven_flash_v2`. `optimize_streaming_latency: 3`.
+- Built-in system tools: `language_detection` (switch EN ↔ AR mid-call) and
+  `end_call` (hang up on goodbye).
+- The live panel has a microphone mute toggle, a listening/speaking/muted
+  status pill and an input-level meter.
 
 ## Configuring the ElevenLabs agent
 
