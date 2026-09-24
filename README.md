@@ -47,7 +47,8 @@ Tables live in the shared Supabase project `dhvwycxkkbqzvmrkysym`, schema
   `keep_transcript`, `handover`, start/end times. No personal data.
 - `messages` — transcript lines, written **only** when the visitor ticked
   "keep a transcript".
-- `leads` — handover requests (`request_handover` tool) with the agent's reason.
+- `leads` — handover requests (`request_handover` tool). The free-form reason is
+  kept only when the visitor opted into the transcript; otherwise it is `null`.
 
 The browser only talks to `POST /api/session`; the route writes with the
 service-role key. `anon` has no privileges on the schema. Without the two

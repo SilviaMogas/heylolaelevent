@@ -88,6 +88,20 @@ export async function storeSessionEvent(
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 8_000);
 
+  type Conv =
+    | { ok: true; open: boolean; keep: boolean }
+    | { ok: false; status: number };
+  const keepTranscript = async (id: string): Promise<Conv> => {
+    const r = await fetchImpl(
+      `${rest}/conversations?id=eq.${id}&select=keep_transcript,ended_at`,
+      { headers: headers(key), signal: controller.signal },
+    );
+    if (!r.ok) return { ok: false, status: r.status };
+    const rows = (await r.json()) as { keep_transcript: boolean; ended_at: string | null }[];
+    const row = rows[0];
+    return { ok: true, open: !!row && row.ended_at === null, keep: !!row?.keep_transcript };
+  };
+
   try {
     let res: Response;
     switch (event.type) {
@@ -109,13 +123,9 @@ export async function storeSessionEvent(
         }
       case "message": {
         // Only persist when the visitor opted in to keeping the transcript.
-        const conv = await fetchImpl(
-          `${rest}/conversations?id=eq.${event.conversationId}&select=keep_transcript`,
-          { headers: headers(key), signal: controller.signal },
-        );
+        const conv = await keepTranscript(event.conversationId);
         if (!conv.ok) return { ok: false, status: conv.status };
-        const rows = (await conv.json()) as { keep_transcript: boolean }[];
-        if (!rows[0]?.keep_transcript) return { ok: true };
+        if (!conv.open || !conv.keep) return { ok: true };
         res = await fetchImpl(`${rest}/messages`, {
           method: "POST",
           headers: headers(key, { Prefer: "return=minimal" }),
@@ -128,14 +138,19 @@ export async function storeSessionEvent(
         });
         break;
       }
-      case "handover":
+      case "handover": {
+        // The reason may contain the visitor's own words: keep it only with
+        // transcript consent. Ignore handovers for unknown/ended sessions.
+        const conv = await keepTranscript(event.conversationId);
+        if (!conv.ok) return { ok: false, status: conv.status };
+        if (!conv.open) return { ok: true };
         res = await fetchImpl(`${rest}/leads`, {
           method: "POST",
           headers: headers(key, { Prefer: "return=minimal" }),
           body: JSON.stringify({
             conversation_id: event.conversationId,
             lang: event.lang,
-            reason: event.reason ?? null,
+            reason: conv.keep ? (event.reason ?? null) : null,
           }),
           signal: controller.signal,
         });
@@ -148,13 +163,17 @@ export async function storeSessionEvent(
           });
         }
         break;
+      }
       case "end":
-        res = await fetchImpl(`${rest}/conversations?id=eq.${event.conversationId}`, {
-          method: "PATCH",
-          headers: headers(key, { Prefer: "return=minimal" }),
-          body: JSON.stringify({ ended_at: new Date().toISOString() }),
-          signal: controller.signal,
-        });
+        res = await fetchImpl(
+          `${rest}/conversations?id=eq.${event.conversationId}&ended_at=is.null`,
+          {
+            method: "PATCH",
+            headers: headers(key, { Prefer: "return=minimal" }),
+            body: JSON.stringify({ ended_at: new Date().toISOString() }),
+            signal: controller.signal,
+          },
+        );
         break;
     }
     return res.ok ? { ok: true } : { ok: false, status: res.status };

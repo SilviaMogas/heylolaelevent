@@ -54,7 +54,7 @@ describe("storeSessionEvent", () => {
   });
 
   it("does not store messages unless the conversation opted in", async () => {
-    const f = okFetch([{ keep_transcript: false }]);
+    const f = okFetch([{ keep_transcript: false, ended_at: null }]);
     const res = await storeSessionEvent(f as unknown as typeof fetch, ENV, {
       type: "message",
       conversationId: ID,
@@ -66,7 +66,7 @@ describe("storeSessionEvent", () => {
   });
 
   it("stores messages when opted in", async () => {
-    const f = okFetch([{ keep_transcript: true }]);
+    const f = okFetch([{ keep_transcript: true, ended_at: null }]);
     await storeSessionEvent(f as unknown as typeof fetch, ENV, {
       type: "message",
       conversationId: ID,
@@ -78,17 +78,50 @@ describe("storeSessionEvent", () => {
   });
 
   it("records a lead and flags the conversation on handover", async () => {
-    const f = okFetch();
+    const f = okFetch([{ keep_transcript: true, ended_at: null }]);
     await storeSessionEvent(f as unknown as typeof fetch, ENV, {
       type: "handover",
       conversationId: ID,
       lang: "en",
       reason: "unverified",
     });
-    expect((f.mock.calls[0] as [string])[0]).toBe("https://x.supabase.co/rest/v1/leads");
-    const [url, init] = f.mock.calls[1] as [string, RequestInit];
+    const [leadUrl, leadInit] = f.mock.calls[1] as [string, RequestInit];
+    expect(leadUrl).toBe("https://x.supabase.co/rest/v1/leads");
+    expect(JSON.parse(leadInit.body as string).reason).toBe("unverified");
+    const [url, init] = f.mock.calls[2] as [string, RequestInit];
     expect(url).toContain(`/conversations?id=eq.${ID}`);
     expect(init.method).toBe("PATCH");
+  });
+
+  it("drops the free-form handover reason without transcript consent", async () => {
+    const f = okFetch([{ keep_transcript: false, ended_at: null }]);
+    await storeSessionEvent(f as unknown as typeof fetch, ENV, {
+      type: "handover",
+      conversationId: ID,
+      lang: "en",
+      reason: "My name is Sam, can Lola arrange a vet?",
+    });
+    const [, leadInit] = f.mock.calls[1] as [string, RequestInit];
+    expect(JSON.parse(leadInit.body as string).reason).toBeNull();
+  });
+
+  it("ignores handovers and messages for ended or unknown conversations", async () => {
+    for (const rows of [[{ keep_transcript: true, ended_at: "2026-01-01T00:00:00Z" }], []]) {
+      const f = okFetch(rows);
+      const res = await storeSessionEvent(f as unknown as typeof fetch, ENV, {
+        type: "handover",
+        conversationId: ID,
+        lang: "en",
+      });
+      expect(res).toEqual({ ok: true });
+      expect(f).toHaveBeenCalledTimes(1);
+    }
+  });
+
+  it("only sets ended_at once", async () => {
+    const f = okFetch();
+    await storeSessionEvent(f as unknown as typeof fetch, ENV, { type: "end", conversationId: ID });
+    expect((f.mock.calls[0] as [string])[0]).toContain("ended_at=is.null");
   });
 
   it("reports upstream failures", async () => {
