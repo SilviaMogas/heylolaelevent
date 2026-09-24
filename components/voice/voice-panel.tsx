@@ -184,9 +184,12 @@ function VoicePanelInner({
   const pendingSent = useRef(false);
   // Texts already rendered as user bubbles locally — dedupe SDK echoes.
   const pendingEchoes = useRef<string[]>([]);
+  // Last pushed line — dedupe the SDK's repeated agent_response frames.
+  const lastPushed = useRef<{ role: string; text: string } | null>(null);
 
   const pushLine = useCallback(
     (line: TranscriptLine) => {
+      lastPushed.current = { role: line.role, text: line.text.trim() };
       setLines((prev) => {
         if (keepTranscript) return [...prev, line];
         // Data minimisation: only keep the last two lines.
@@ -230,6 +233,11 @@ function VoicePanelInner({
             pendingEchoes.current.splice(i, 1);
             return;
           }
+        } else if (
+          lastPushed.current?.role === "agent" &&
+          lastPushed.current.text === m.message.trim()
+        ) {
+          return;
         }
         pushLine({
           role: m.source === "user" ? "user" : "agent",
@@ -260,6 +268,8 @@ function VoicePanelInner({
   }, [lang, pushLine, clientToolHandlers]);
 
   const begin = async () => {
+    pendingEchoes.current = [];
+    lastPushed.current = null;
     setState("connecting");
     try {
       const res = await fetch("/api/elevenlabs/signed-url");
@@ -292,6 +302,7 @@ function VoicePanelInner({
 
   const end = () => {
     pendingEchoes.current = [];
+    lastPushed.current = null;
     mockRef.current?.end();
     mockRef.current = null;
     stopPlayback();
@@ -431,6 +442,23 @@ function VoicePanelInner({
         : "idle";
 
   const isMuted = conversation.isMuted ?? false;
+
+  // Poll the mic input level while live.
+  const [inputLevel, setInputLevel] = useState(0);
+  useEffect(() => {
+    if (state !== "live") {
+      setInputLevel(0);
+      return;
+    }
+    const id = setInterval(() => {
+      try {
+        setInputLevel(conversation.getInputVolume());
+      } catch {
+        /* no live input */
+      }
+    }, 100);
+    return () => clearInterval(id);
+  }, [state, conversation]);
 
   return (
     <div
@@ -691,15 +719,49 @@ function VoicePanelInner({
         <div className="mt-auto space-y-2 border-t border-charcoal/10 px-5 py-4 text-xs text-charcoal/70">
           <div className="flex items-center justify-between gap-3">
             <p>{t("voice.minimisation")}</p>
-            {(state === "live" || state === "demo") && (
-              <button
-                type="button"
-                onClick={end}
-                className="min-h-11 shrink-0 rounded-full bg-charcoal px-5 text-sm font-bold text-bone"
-              >
-                {t("voice.end")}
-              </button>
-            )}
+            <div className="flex items-center gap-2">
+              {state === "live" && (
+                <>
+                  <span
+                    aria-live="polite"
+                    className="rounded-full bg-cream px-3 py-1 text-xs font-semibold text-charcoal/80"
+                  >
+                    {isMuted
+                      ? t("voice.muted")
+                      : conversation.isSpeaking
+                        ? t("voice.speaking")
+                        : t("voice.listening")}
+                  </span>
+                  <div
+                    role="meter"
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-valuenow={Math.min(
+                      100,
+                      Math.round(inputLevel * 100),
+                    )}
+                    aria-label={t("voice.micLevel")}
+                    className="h-1.5 w-16 overflow-hidden rounded-full bg-charcoal/10"
+                  >
+                    <div
+                      className="h-full rounded-full bg-brand transition-[width] duration-100"
+                      style={{
+                        width: `${Math.min(100, Math.round(inputLevel * 100))}%`,
+                      }}
+                    />
+                  </div>
+                </>
+              )}
+              {(state === "live" || state === "demo") && (
+                <button
+                  type="button"
+                  onClick={end}
+                  className="min-h-11 shrink-0 rounded-full bg-charcoal px-5 text-sm font-bold text-bone"
+                >
+                  {t("voice.end")}
+                </button>
+              )}
+            </div>
           </div>
           <a href="#handover" className="inline-block font-semibold underline">
             {t("voice.human")}
