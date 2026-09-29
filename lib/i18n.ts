@@ -114,6 +114,8 @@ export const dict: Record<Lang, Record<string, string>> = {
     "newsletter.success":
       "You're on the list. Check your inbox for a welcome note.",
     "newsletter.error.consent": "Please tick the consent box to subscribe.",
+    "newsletter.error.email": "Please enter a valid email address.",
+    "newsletter.error.rate_limited": "Too many attempts. Please try again in a few minutes.",
     "newsletter.error.generic":
       "Unable to subscribe right now. Please try again or email hey@heylola.co.",
   },
@@ -219,6 +221,8 @@ export const dict: Record<Lang, Record<string, string>> = {
       "أوافق على تلقي رسائل من HeyLola. يمكنك إلغاء الاشتراك في أي وقت.",
     "newsletter.success": "أنت على القائمة. تفقّد بريدك للحصول على رسالة الترحيب.",
     "newsletter.error.consent": "يرجى تحديد خانة الموافقة للاشتراك.",
+    "newsletter.error.email": "يرجى إدخال بريد إلكتروني صحيح.",
+    "newsletter.error.rate_limited": "محاولات كثيرة. يرجى المحاولة مرة أخرى بعد بضع دقائق.",
     "newsletter.error.generic":
       "لا يمكن الاشتراك الآن. حاول مرة أخرى أو راسلنا على hey@heylola.co.",
   },

@@ -9,6 +9,8 @@ type Status =
   | { kind: "success" }
   | { kind: "error"; message: string };
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export function NewsletterSignup() {
   const { t } = useLang();
   const [email, setEmail] = useState("");
@@ -17,6 +19,10 @@ export function NewsletterSignup() {
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (!EMAIL_RE.test(email.trim())) {
+      setStatus({ kind: "error", message: t("newsletter.error.email") });
+      return;
+    }
     if (!consent) {
       setStatus({ kind: "error", message: t("newsletter.error.consent") });
       return;
@@ -32,11 +38,15 @@ export function NewsletterSignup() {
           signup_url: window.location.href,
         }),
       });
-      const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) {
         setStatus({
           kind: "error",
-          message: data.error || t("newsletter.error.generic"),
+          message:
+            res.status === 429
+              ? t("newsletter.error.rate_limited")
+              : res.status === 400
+                ? t("newsletter.error.email")
+                : t("newsletter.error.generic"),
         });
         return;
       }

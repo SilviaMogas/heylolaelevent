@@ -48,10 +48,13 @@ export async function POST(req: Request) {
     if (!res.ok || data.ok === false) {
       return NextResponse.json(
         { error: data.error || "Unable to subscribe right now." },
-        { status: res.status >= 400 && res.status < 500 ? 400 : 502 },
+        { status: res.status === 429 ? 429 : res.status >= 400 && res.status < 500 ? 400 : 502 },
       );
     }
-    return NextResponse.json({ ok: true, status: data.status ?? "subscribed" });
+    if (typeof data.status !== "string") {
+      return NextResponse.json({ error: "Unable to subscribe right now." }, { status: 502 });
+    }
+    return NextResponse.json({ ok: true, status: data.status });
   } catch {
     return NextResponse.json({ error: "Unable to subscribe right now." }, { status: 502 });
   }
