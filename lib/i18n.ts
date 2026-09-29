@@ -102,6 +102,22 @@ export const dict: Record<Lang, Record<string, string>> = {
     "footer.source": "Challenge source code",
     "footer.challenge":
       "ElevenLabs challenge demo — not an official Dubai Municipality service",
+    "newsletter.title": "Stay in the loop",
+    "newsletter.body":
+      "Occasional notes from HeyLola on what we're building for dog parents. No noise.",
+    "newsletter.email_label": "Email address",
+    "newsletter.email_placeholder": "you@example.com",
+    "newsletter.submit": "Subscribe",
+    "newsletter.submitting": "Subscribing…",
+    "newsletter.consent":
+      "I agree to receive emails from HeyLola. Unsubscribe any time.",
+    "newsletter.success":
+      "You're on the list. Check your inbox for a welcome note.",
+    "newsletter.error.consent": "Please tick the consent box to subscribe.",
+    "newsletter.error.email": "Please enter a valid email address.",
+    "newsletter.error.rate_limited": "Too many attempts. Please try again in a few minutes.",
+    "newsletter.error.generic":
+      "Unable to subscribe right now. Please try again or email hey@heylola.co.",
   },
   ar: {
     "brand.tagline": "كونسيرج أسلوب حياة كلبك.",
@@ -194,5 +210,20 @@ export const dict: Record<Lang, Record<string, string>> = {
     "footer.source": "كود مشروع التحدي",
     "footer.challenge":
       "عرض تجريبي لتحدي ElevenLabs — ليس خدمة رسمية لبلدية دبي",
+    "newsletter.title": "ابقَ على اطلاع",
+    "newsletter.body":
+      "ملاحظات من حين لآخر من HeyLola عمّا نبنيه لأهل الكلاب. بلا ضجيج.",
+    "newsletter.email_label": "البريد الإلكتروني",
+    "newsletter.email_placeholder": "you@example.com",
+    "newsletter.submit": "اشترك",
+    "newsletter.submitting": "جارٍ الاشتراك…",
+    "newsletter.consent":
+      "أوافق على تلقي رسائل من HeyLola. يمكنك إلغاء الاشتراك في أي وقت.",
+    "newsletter.success": "أنت على القائمة. تفقّد بريدك للحصول على رسالة الترحيب.",
+    "newsletter.error.consent": "يرجى تحديد خانة الموافقة للاشتراك.",
+    "newsletter.error.email": "يرجى إدخال بريد إلكتروني صحيح.",
+    "newsletter.error.rate_limited": "محاولات كثيرة. يرجى المحاولة مرة أخرى بعد بضع دقائق.",
+    "newsletter.error.generic":
+      "لا يمكن الاشتراك الآن. حاول مرة أخرى أو راسلنا على hey@heylola.co.",
   },
 };
