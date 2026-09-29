@@ -7,6 +7,7 @@ import { Wordmark } from "@/components/wordmark";
 import { DistinctionBanner, JourneyCard } from "@/components/journey-card";
 import { VoicePanelLauncher } from "@/components/voice/voice-panel";
 import { LolaOrb } from "@/components/lola-orb";
+import { NewsletterSignup } from "@/components/newsletter-signup";
 import { AUTHORITY_CONTACT, SOURCES } from "@/lib/lemon";
 import type { JourneyId } from "@/lib/lemon";
 
@@ -154,6 +155,7 @@ export default function Home() {
             ))}
           </ul>
           <p className="text-xs text-charcoal/60">{t("footer.disclaimer")}</p>
+          <NewsletterSignup />
           <div className="flex flex-wrap items-center justify-between gap-4 border-t border-charcoal/10 pt-4">
             <a
               href="https://heylola.co"
