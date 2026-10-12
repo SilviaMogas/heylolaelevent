@@ -55,8 +55,8 @@ export function createPearxVoiceHandler(publicKey = PEARX_PUBLIC_KEY) {
       if (!response.ok || !response.headers.get("content-type")?.startsWith("audio/")) {
         return json(503, "Voice is unavailable.");
       }
-      return new Response(await response.arrayBuffer(), {
-        headers: { "Content-Type": "audio/mpeg", "Cache-Control": "no-store" },
+      return new Response(response.body, {
+        headers: { "Content-Type": response.headers.get("content-type")!, "Cache-Control": "no-store" },
       });
     } catch { return json(503, "Voice is unavailable."); }
   };

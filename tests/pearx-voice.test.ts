@@ -24,9 +24,12 @@ describe("PearX voice relay", () => {
   });
   it("uses existing ElevenLabs credentials and returns audio, rejecting replay on a warm instance", async () => {
     const handle = createPearxVoiceHandler(publicKey);
-    const upstream = vi.fn().mockResolvedValue(new Response("audio", { headers: { "Content-Type": "audio/mpeg" } }));
+    const upstreamResponse = new Response("audio", { headers: { "Content-Type": "audio/ogg" } });
+    const upstream = vi.fn().mockResolvedValue(upstreamResponse);
     const req = request(), replay = req.clone();
     const response = await handle(req, env, upstream);
+    expect(response.body).toBe(upstreamResponse.body);
+    expect(response.headers.get("Content-Type")).toBe("audio/ogg");
     expect(await response.text()).toBe("audio");
     expect(response.headers.get("Cache-Control")).toBe("no-store");
     expect(upstream.mock.calls[0][0]).toBe("https://api.elevenlabs.io/v1/text-to-speech/test-voice");
