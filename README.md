@@ -208,3 +208,20 @@ Dashboard notes:
   only need matching names in the agent config.
 - `platform_settings.auth.enable_auth` is on, so every session needs a signed
   URL from `/api/elevenlabs/signed-url`.
+
+## PearX speech relay
+
+`POST /api/elevenlabs/pearx-voice` reuses this project's existing ElevenLabs key and
+voice to read PearX travel answers. It does not change the adoption agent, its
+prompt, or its knowledge. Requests are signed server-to-server with Ed25519:
+PearX holds `VOICE_RELAY_PRIVATE_KEY`; `lib/elevenlabs/pearx-voice.ts` pins only its
+public key. The signed JSON includes `aud: heylolaelevent:tts`, `issuedAt` in
+milliseconds, a UUID `nonce`, and `text` (1–5000 characters). Sign the exact UTF-8
+body, putting the base64 signature in `x-pearx-signature`.
+
+Requests expire after 60 seconds. Replay tracking is per warm instance, not
+shared durable storage; use provider spending limits before widening access.
+No CORS access or ElevenLabs key is given to PearX browsers. Key rotation requires
+updating the pinned public key and PearX private environment variable together.
+Deploy this relay before the PearX caller; live TTS permissions/credits must be
+verified separately from the conversational-agent signed-URL endpoint.
